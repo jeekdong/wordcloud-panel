@@ -7,7 +7,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 // 粗图标他白色
-const colors = ["#9195F6", "#B7C9F2", "#F9F07A", "#FB88B4"];
+const theme1 = ['#FF87E5', '#5B89F7', '#FEC582'];
+const theme2 = ['#F27DE0', '#5778EE', '#57B8FF']
+
+const themeInfo = {
+  1: theme1,
+  2: theme2
+}
 
 export const Word = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,19 +25,19 @@ export const Word = () => {
 
   const renderWordCloud = (
     _data: [string, number][],
-    _options: WordCloud.Options
+    _options: WordCloud.Options & {theme: '1' | '2'}
   ) => {
     if (canvasRef.current) {
       WordCloud.stop();
       WordCloud(canvasRef.current, {
         list: _data.map(item => [...item]),
         ..._options,
-        fontFamily: "sans serif", // 字体
+        fontFamily: "fzyj", // 字体
         shrinkToFit: true, // 根据容器大小调整词云大小
         rotateRatio: 1,
         color: () => {
           // 随机返回 options.color 数组中的某个颜色
-          return colors[Math.floor(Math.random() * colors.length)];
+          return themeInfo[_options.theme]?.[Math.floor(Math.random() * themeInfo[_options.theme].length)];
         },
       });
     }
@@ -53,6 +59,7 @@ export const Word = () => {
     maxRotation,
     fontWeight,
     backgroundColor,
+    theme
   } = useControls({
     gridSize: {
       value: 8,
@@ -83,6 +90,10 @@ export const Word = () => {
       value: "#FFF",
       hint: "背景颜色",
     },
+    theme: {
+      value: '1',
+      options: ['1', '2']
+    }
   });
 
   useEffect(() => {
@@ -94,6 +105,7 @@ export const Word = () => {
       maxRotation,
       fontWeight,
       backgroundColor,
+      theme: theme as '1' | '2'
     });
   }, [
     gridSize,
@@ -104,6 +116,7 @@ export const Word = () => {
     fontWeight,
     backgroundColor,
     setOptions,
+    theme
   ]);
 
   const handleExport = () => {
@@ -123,8 +136,8 @@ export const Word = () => {
         id="wordCloudCanvas"
         ref={canvasRef}
         className="w-full h-[150%]"
-        width="800"
-        height="1200"
+        width="780"
+        height="740"
       ></canvas>
       <Button
         className="mt-4"
