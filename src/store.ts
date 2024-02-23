@@ -20,11 +20,12 @@ export const usePersistData = create(
           minRotation: 0, // 最小旋转角度
           maxRotation: 0.34, // 最大旋转角度
           fontWeight: "bold",
-        } as Options
+          theme: "1"
+        } as Options & { theme: '1' | '2'}
       },
       set => ({
         setData: (data: [string | null, number | null][]) => set({ data }),
-        setOptions: (options: Options) => set({ options })
+        setOptions: (options: Options & { theme: '1' | '2'}) => set({ options })
       })
     ),
     {
