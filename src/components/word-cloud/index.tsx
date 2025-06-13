@@ -2,18 +2,18 @@ import WordCloud from "wordcloud";
 import { useControls, Leva } from "leva";
 
 import { usePersistData } from "@/store";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 
-// 粗图标他白色
+// 预置主题颜色
 const theme1 = ['#FF87E5', '#5B89F7', '#FEC582'];
-const theme2 = ['#F27DE0', '#5778EE', '#57B8FF']
+const theme2 = ['#F27DE0', '#5778EE', '#57B8FF'];
 
-const themeInfo = {
+const presetThemeInfo = {
   1: theme1,
-  2: theme2
-}
+  2: theme2,
+};
 
 export const Word = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,7 +25,7 @@ export const Word = () => {
 
   const renderWordCloud = (
     _data: [string, number][],
-    _options: WordCloud.Options & {theme: '1' | '2'}
+    _options: WordCloud.Options & { theme: '1' | '2' | 'custom'; customColors: string[] }
   ) => {
     if (canvasRef.current) {
       WordCloud.stop();
@@ -36,8 +36,12 @@ export const Word = () => {
         shrinkToFit: true, // 根据容器大小调整词云大小
         rotateRatio: 1,
         color: () => {
-          // 随机返回 options.color 数组中的某个颜色
-          return themeInfo[_options.theme]?.[Math.floor(Math.random() * themeInfo[_options.theme].length)];
+          const themeMap = {
+            ...presetThemeInfo,
+            custom: _options.customColors,
+          } as Record<string, string[]>;
+          const colors = themeMap[_options.theme] || [];
+          return colors[Math.floor(Math.random() * colors.length)];
         },
       });
     }
@@ -92,7 +96,7 @@ export const Word = () => {
     },
     theme: {
       value: '1',
-      options: ['1', '2']
+      options: ['1', '2', 'custom']
     }
   });
 
@@ -105,7 +109,8 @@ export const Word = () => {
       maxRotation,
       fontWeight,
       backgroundColor,
-      theme: theme as '1' | '2'
+      theme: theme as '1' | '2' | 'custom',
+      customColors: options.customColors
     });
   }, [
     gridSize,
